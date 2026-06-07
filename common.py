@@ -9,7 +9,8 @@ import requests
 from dotenv import load_dotenv
 
 
-DATA_DIR = Path("data")
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_DIR = PROJECT_DIR / "data_json"
 
 
 class ApiError(RuntimeError):
@@ -17,7 +18,7 @@ class ApiError(RuntimeError):
 
 
 def load_environment() -> None:
-    load_dotenv()
+    load_dotenv(PROJECT_DIR / ".env")
 
 
 def require_env(name: str) -> str:
@@ -25,6 +26,21 @@ def require_env(name: str) -> str:
     if not value:
         raise RuntimeError(f"Missing required environment variable: {name}")
     return value
+
+
+def api_delay_seconds() -> float:
+    raw_value = os.getenv("API_DELAY_SECONDS", "1.0")
+    try:
+        return max(0.0, float(raw_value))
+    except ValueError:
+        print(f"Invalid API_DELAY_SECONDS={raw_value!r}; using 1.0 seconds.")
+        return 1.0
+
+
+def pace_api_calls() -> None:
+    delay = api_delay_seconds()
+    if delay > 0:
+        time.sleep(delay)
 
 
 def load_json(path: str | Path, default: Any = None) -> Any:

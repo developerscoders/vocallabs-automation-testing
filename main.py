@@ -4,7 +4,7 @@ import sys
 from common import load_environment
 import stage1_ocean
 import stage2_prospeo
-import stage3_eazyreach
+import stage3_prospeo_FP
 import stage4_brevo
 
 
@@ -28,7 +28,7 @@ def main() -> int:
     try:
         domains = stage1_ocean.run(seed_domain, resume=resume, limit=args.company_limit)
         contacts = stage2_prospeo.run(domains, resume=resume, per_company=args.contacts_per_company)
-        resolved = stage3_eazyreach.run(contacts, resume=resume)
+        resolved = stage3_prospeo_FP.run(contacts, resume=resume)
         stage4_brevo.run(resolved, resume=resume, dry_run=args.dry_run)
     except KeyboardInterrupt:
         print("\nPipeline interrupted. Re-run without --fresh to resume from saved JSON files.")
